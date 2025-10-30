@@ -1,0 +1,89 @@
+# Development docker-compose file
+# For production, use: docker-compose -f docker-compose.prod.yml up
+# For development, use: docker-compose up (or make dev-up)
+
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:6.0
+    container_name: easygenerator-mongodb-dev
+    restart: unless-stopped
+    ports:
+      - '27017:27017'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password123
+      MONGO_INITDB_DATABASE: easygenerator-auth
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - easygenerator-network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: easygenerator-api-dev
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+      - '9229:9229'  # Debug port
+    environment:
+      - MONGODB_URI=mongodb://admin:password123@mongodb:27017/easygenerator-auth?authSource=admin
+      - JWT_SECRET=dev-secret-key-change-this-in-production
+      - JWT_REFRESH_SECRET=dev-refresh-secret-key-change-this-in-production
+      - JWT_EXPIRES_IN=1h
+      - JWT_REFRESH_EXPIRES_IN=7d
+      - PORT=3000
+      - NODE_ENV=development
+      - LOG_LEVEL=debug
+      - CORS_ORIGIN=*
+    volumes:
+      # Mount source code for hot reload
+      - ./src:/app/src:delegated
+      - ./test:/app/test:delegated
+      # Prevent overwriting node_modules
+      - /app/node_modules
+      # Mount config files
+      - ./tsconfig.json:/app/tsconfig.json:ro
+      - ./nest-cli.json:/app/nest-cli.json:ro
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - easygenerator-network
+    command: pnpm run start:dev
+
+  # MongoDB Express for database management
+  mongo-express:
+    image: mongo-express:1.0-alpine
+    container_name: easygenerator-mongo-express-dev
+    restart: unless-stopped
+    ports:
+      - '8081:8081'
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+      ME_CONFIG_MONGODB_ADMINPASSWORD: password123
+      ME_CONFIG_MONGODB_URL: mongodb://admin:password123@mongodb:27017/
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: admin123
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - easygenerator-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  easygenerator-network:
+    driver: bridge
