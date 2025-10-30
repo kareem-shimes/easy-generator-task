@@ -6,13 +6,16 @@ FROM node:20-alpine
 # Install dependencies for better development experience
 RUN apk add --no-cache libc6-compat
 
+# Enable pnpm
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
 WORKDIR /app
 
 # Copy package files
-COPY package.json package-lock.json ./
+COPY package.json pnpm-lock.yaml* ./
 
 # Install all dependencies (including dev dependencies)
-RUN npm ci
+RUN pnpm install --frozen-lockfile
 
 # Copy source code
 COPY . .
@@ -24,4 +27,4 @@ EXPOSE 3000
 ENV NODE_ENV=development
 
 # Start the Next.js development server with hot reloading
-CMD ["npm", "run", "dev"]
+CMD ["pnpm", "run", "dev"]
