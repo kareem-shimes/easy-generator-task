@@ -34,8 +34,8 @@ Perfect for microservices architectures, this API can be used as a standalone au
 
 ```bash
 # Clone the repository
-git clone <your-repo-url>
-cd easygenerator-auth-api
+git clone https://github.com/kareem-shimes/easy-generator-task
+cd auth-api
 
 # Enable pnpm (if not already installed)
 corepack enable
@@ -61,11 +61,13 @@ openssl rand -base64 32  # For JWT_REFRESH_SECRET
 ### 3. Start MongoDB
 
 **Option A: Using Docker**
+
 ```bash
 docker-compose up -d mongodb
 ```
 
 **Option B: Local MongoDB**
+
 ```bash
 # macOS
 brew services start mongodb-community
@@ -86,6 +88,7 @@ pnpm run start:prod
 ```
 
 The API will be running at:
+
 - **API**: http://localhost:3000
 - **Swagger Docs**: http://localhost:3000/api/docs
 - **Health Check**: http://localhost:3000/health
@@ -97,6 +100,7 @@ All endpoints return JSON responses. The API uses Bearer token authentication fo
 ### Authentication Endpoints
 
 #### Sign Up
+
 Creates a new user account and returns access token with httpOnly refresh token cookie.
 
 ```bash
@@ -122,6 +126,7 @@ Content-Type: application/json
 ```
 
 #### Sign In
+
 Authenticates user credentials and returns access token with httpOnly refresh token cookie.
 
 ```bash
@@ -146,6 +151,7 @@ Content-Type: application/json
 ```
 
 #### Refresh Token
+
 Uses refresh token from httpOnly cookie to generate new access and refresh tokens.
 
 ```bash
@@ -166,6 +172,7 @@ POST /auth/refresh
 ```
 
 #### Logout
+
 Clears the refresh token cookie. Client should also discard the access token.
 
 ```bash
@@ -183,6 +190,7 @@ POST /auth/logout
 These endpoints require a valid JWT access token in the Authorization header.
 
 #### Get Profile
+
 Retrieves the current user's profile information.
 
 ```bash
@@ -200,6 +208,7 @@ Authorization: Bearer <your_jwt_token>
 ```
 
 #### Update Profile
+
 Updates the current user's profile information.
 
 ```bash
@@ -224,6 +233,7 @@ Content-Type: application/json
 ### Health Check
 
 #### Health Status
+
 Returns the API health status and database connection state.
 
 ```bash
@@ -276,11 +286,11 @@ curl -X POST http://localhost:3000/auth/logout \
 
 - **Email**: Must be a valid email format
 - **Name**: Minimum 3 characters
-- **Password**: 
+- **Password**:
   - Minimum 8 characters
   - At least one letter
   - At least one number
-  - At least one special character (@$!%*#?&)
+  - At least one special character (@$!%\*#?&)
 
 ## 🐳 Docker Deployment
 
@@ -289,6 +299,7 @@ The project includes comprehensive Docker support for both development and produ
 ### Quick Start with Docker
 
 **Development:**
+
 ```bash
 # Using Make (recommended)
 make dev-up
@@ -302,6 +313,7 @@ docker-compose up -d
 ```
 
 **Production:**
+
 ```bash
 # Set up production environment
 cp .env.production.example .env.production
@@ -357,6 +369,7 @@ make health         # Check service health
 ### Features
 
 **Development Environment:**
+
 - ✅ Hot reload with volume mounts (src/ and test/ directories)
 - ✅ Debug port exposed (9229)
 - ✅ Mongo Express for database management (admin/admin123)
@@ -365,6 +378,7 @@ make health         # Check service health
 - ✅ Automatic restart on file changes
 
 **Production Environment:**
+
 - ✅ Multi-stage optimized builds for minimal image size
 - ✅ Non-root user (nodejs:1001) for security
 - ✅ Health checks enabled (30s intervals)
@@ -392,6 +406,7 @@ pnpm run test:cov
 ```
 
 **E2E Test Configuration:**
+
 - E2E tests automatically use `.env.test` file (separate test database)
 - Test database: `easygenerator-auth-test` (isolated from development/production)
 - Database is automatically cleaned before and after tests
@@ -512,23 +527,24 @@ easygenerator-auth-api/
 
 ## 🔧 Environment Variables
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `MONGODB_URI` | MongoDB connection string | `mongodb://localhost:27017/easygenerator-auth` |
-| `JWT_SECRET` | Secret key for access token signing | (required, min 32 chars) |
-| `JWT_EXPIRES_IN` | Access token expiration time | `1h` |
-| `JWT_REFRESH_SECRET` | Secret key for refresh token signing | (required, min 32 chars, must differ from JWT_SECRET) |
-| `JWT_REFRESH_EXPIRES_IN` | Refresh token expiration time | `7d` |
-| `PORT` | Server port | `3000` |
-| `NODE_ENV` | Environment mode | `development` |
-| `LOG_LEVEL` | Logging level | `debug` |
-| `CORS_ORIGIN` | Allowed CORS origins | `*` |
+| Variable                 | Description                          | Default                                               |
+| ------------------------ | ------------------------------------ | ----------------------------------------------------- |
+| `MONGODB_URI`            | MongoDB connection string            | `mongodb://localhost:27017/easygenerator-auth`        |
+| `JWT_SECRET`             | Secret key for access token signing  | (required, min 32 chars)                              |
+| `JWT_EXPIRES_IN`         | Access token expiration time         | `1h`                                                  |
+| `JWT_REFRESH_SECRET`     | Secret key for refresh token signing | (required, min 32 chars, must differ from JWT_SECRET) |
+| `JWT_REFRESH_EXPIRES_IN` | Refresh token expiration time        | `7d`                                                  |
+| `PORT`                   | Server port                          | `3000`                                                |
+| `NODE_ENV`               | Environment mode                     | `development`                                         |
+| `LOG_LEVEL`              | Logging level                        | `debug`                                               |
+| `CORS_ORIGIN`            | Allowed CORS origins                 | `*`                                                   |
 
 ## 🔐 Security Features
 
 This project implements multiple layers of security:
 
 ### Authentication & Authorization
+
 - **Dual Token System**: Separate access and refresh tokens with different expiration times
 - **Token Rotation**: New refresh token issued on each refresh request
 - **HttpOnly Cookies**: Refresh tokens stored in httpOnly cookies (not accessible via JavaScript)
@@ -537,6 +553,7 @@ This project implements multiple layers of security:
 - **JWT Guards**: Route protection with Passport JWT strategy
 
 ### API Security
+
 - **Input Validation**: Class-validator for DTO validation on all endpoints
 - **Whitelist Mode**: Strip unknown properties from requests
 - **Rate Limiting**: Nginx-based rate limiting (5 req/s for auth, 10 req/s for API)
@@ -544,6 +561,7 @@ This project implements multiple layers of security:
 - **Security Headers**: HSTS, X-Frame-Options, X-Content-Type-Options, CSP
 
 ### Infrastructure Security
+
 - **Non-Root User**: Docker containers run as non-root user (nodejs:1001)
 - **Environment Isolation**: Separate configurations for dev/test/prod
 - **SSL/TLS Support**: Nginx reverse proxy with TLS 1.2/1.3
@@ -551,6 +569,7 @@ This project implements multiple layers of security:
 - **Secret Management**: Environment-based secrets (never hardcoded)
 
 ### Best Practices
+
 - **Minimal Docker Images**: Alpine Linux base for smaller attack surface
 - **Multi-Stage Builds**: Production images contain only necessary files
 - **Dependency Auditing**: Regular security updates via pnpm
@@ -568,6 +587,7 @@ The project includes GitHub Actions workflows for continuous integration and dep
 ### Common Issues
 
 **MongoDB Connection Error**
+
 ```bash
 # Ensure MongoDB is running
 docker-compose up -d mongodb
@@ -579,6 +599,7 @@ docker-compose logs mongodb
 ```
 
 **Port Already in Use**
+
 ```bash
 # Check what's using port 3000
 lsof -i :3000
@@ -588,6 +609,7 @@ PORT=3001
 ```
 
 **PNPM Not Found**
+
 ```bash
 # Enable corepack (comes with Node.js 16.9+)
 corepack enable
@@ -595,6 +617,7 @@ corepack prepare pnpm@10.18.3 --activate
 ```
 
 **Docker Build Fails**
+
 ```bash
 # Clean Docker cache and rebuild
 docker system prune -af
@@ -602,6 +625,7 @@ make dev-build
 ```
 
 **E2E Tests Fail**
+
 ```bash
 # Ensure test database is clean
 # The tests should auto-cleanup, but you can manually drop it:
@@ -612,6 +636,7 @@ db.dropDatabase()
 ```
 
 **JWT Token Errors**
+
 - Ensure `JWT_SECRET` and `JWT_REFRESH_SECRET` are at least 32 characters
 - Ensure `JWT_SECRET` and `JWT_REFRESH_SECRET` are different values
 - Check token expiration times in `.env`
