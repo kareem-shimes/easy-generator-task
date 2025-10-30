@@ -35,29 +35,24 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8
-
       - name: Setup Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: "pnpm"
-          cache-dependency-path: "./backend/pnpm-lock.yaml"
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: npm ci
 
       - name: Lint code
-        run: pnpm run lint
+        run: npm run lint
 
       - name: Type check
-        run: pnpm run build
+        run: npm run build
 
       - name: Run unit tests
-        run: pnpm run test
+        run: npm test
         env:
           MONGODB_URI: mongodb://localhost:27017/test
           JWT_SECRET: test-secret-key-for-ci-pipeline-only-min-32-chars
@@ -65,7 +60,7 @@ jobs:
           NODE_ENV: test
 
       - name: Run E2E tests
-        run: pnpm run test:e2e
+        run: npm run test:e2e
         env:
           MONGODB_URI: mongodb://localhost:27017/test-e2e
           JWT_SECRET: test-secret-key-for-ci-pipeline-only-min-32-chars
@@ -73,7 +68,7 @@ jobs:
           NODE_ENV: test
 
       - name: Generate coverage report
-        run: pnpm run test:cov
+        run: npm run test:cov
         env:
           MONGODB_URI: mongodb://localhost:27017/test-cov
           JWT_SECRET: test-secret-key-for-ci-pipeline-only-min-32-chars
