@@ -1,7 +1,0 @@
-# This directory is for SSL certificates
-# Place your SSL certificate and key files here:
-# - cert.pem (or fullchain.pem for Let's Encrypt)
-# - key.pem (or privkey.pem for Let's Encrypt)
-
-# For development, generate self-signed certificates:
-# Run: ./scripts/generate-ssl-cert.sh

@@ -1,0 +1,39 @@
+{
+  "name": "easy-generator-task",
+  "version": "1.0.0",
+  "description": "Full Stack Authentication Application with Next.js and NestJS",
+  "private": true,
+  "scripts": {
+    "start": "docker compose up -d",
+    "stop": "docker compose down",
+    "restart": "docker compose restart",
+    "logs": "docker compose logs -f",
+    "logs:backend": "docker compose logs -f backend",
+    "logs:frontend": "docker compose logs -f frontend",
+    "logs:mongodb": "docker compose logs -f mongodb",
+    "build": "docker compose build",
+    "build:backend": "docker compose build backend",
+    "build:frontend": "docker compose build frontend",
+    "clean": "docker compose down -v",
+    "ps": "docker compose ps",
+    "shell:backend": "docker compose exec backend sh",
+    "shell:frontend": "docker compose exec frontend sh",
+    "shell:mongodb": "docker compose exec mongodb mongosh"
+  },
+  "keywords": [
+    "docker",
+    "nextjs",
+    "nestjs",
+    "authentication",
+    "mongodb",
+    "jwt",
+    "fullstack"
+  ],
+  "author": "Kareem Shimes",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0",
+    "docker": ">=20.10.0",
+    "docker-compose": ">=2.0.0"
+  }
+}
