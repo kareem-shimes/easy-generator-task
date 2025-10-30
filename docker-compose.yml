@@ -1,8 +1,6 @@
 # Development Docker Compose - EasyGenerator Task
 # This file orchestrates both frontend and backend services for development
 
-version: "3.8"
-
 services:
   # MongoDB Database
   mongodb:

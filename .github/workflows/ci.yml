@@ -150,6 +150,7 @@ jobs:
 
       - name: Test docker-compose configuration
         run: |
+          touch backend/.env frontend/.env
           docker compose config
 
   # Final CI Success Gate
